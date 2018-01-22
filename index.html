@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		
+		<title>Sara Chen</title>
+
+		<meta name="description" content="Year 3 Undergraduate Project Presentation">
+		<meta name="author" content="Sara Chen">
+
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/league.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h2>Load Balancing for Virtual Environments in Distributed Systems</h2>
+					<h3>Sara Chen</h3>
+					<h3>(Supervisor: Dr Frederick Li)</h3>
+					<aside class="notes">
+							Good afternoon, everybody. My name is Sara, and today, I will be presenting the topic of my dissertation, titled Load Balancing for Virtual Environments in Distributed Systems, which is supervised by Dr. Frederick Li.
+					</aside>
+				</section>
+				<section>
+					<h2>Background</h2>
+					<ul>
+						<li>
+							Push for more immersive experiences resulting in more complex virtual environments
+						</li>
+						<li>
+							To cope, most virtual environments are now hosted on distributed systems
+						</li>
+					</ul>
+					<img src="./assets/robinson.gif" alt="robinson">
+					<aside class="notes">
+						Before I start talking about the project itself, I would first like to talk about some of the context surrounding the topic. In recent years, as seen with the increasing popularity of AR and VR applications, there has been a push for more immersive experiences; as a result, virtual environments are becoming increasingly complex. So, to cope with this, and growing demand, most virtual environments are now hosted on distributed systems,
+					</aside>
+				</section>
+				<section>
+					<h2>Problems</h2>
+					<p>Consistency must be maintained, but this is <u>difficult</u> because:</p>
+					<ul>
+						<li>Unreliable nature of networks</li>
+						<li>Race conditions</li>
+						<li>Enforcing guaranteed delivery takes time and bandwidth</li>
+					</ul>
+					<aside class="notes">
+						where, to maintain system consistency, messages have to be passed along a limited bandwidth at high frequency between the many components. Due to the unreliable nature of networks, packet delivery cannot be guaranteed, and taking steps to enforce guaranteed delivery and ordering takes up time and bandwidth. This eventually creates a bottleneck, and leads to the overloading problem, as the number of messages exceeds a server's capacity and slows down the entire system. To mitigate this problem, load balancing was introduced, but re-distributing workload across the system takes time. 
+					</aside>
+				</section>
+				<section>
+					<p>Leads to the</p><p style="color:cornflowerblue"><em>overloading problem</em></p>
+				</section>
+				<section>
+					<h2>Added Complexity</h2>
+					<p>
+						Trade-off between contradictory objectives:
+					</p>
+					<ul>
+						<li>Time-critical system</li>
+						<li>Delivery and ordering of messages need to be guaranteed</li>
+					</ul>
+
+					<aside class="notes">
+						And, with virtual environments, there is an added complexity: because of the temporal relationship between events in virtual environments, the system is time-critical; yet, for the exact same reason, both the delivery and ordering of messages need to be guaranteed, and these objectives are contradictory, forcing a trade-off to be made.
+					</aside>
+				</section>
+				<section>
+					<section id="top">
+					<h2>Static Load Balancing</h2>
+					<p>The <em>de facto</em> standard used across industry due to simplicity</p>
+					</a>
+					<br>
+					<ul>
+						<li>Relies on players to choose</li>
+						<li>Divides up virtual environment into regions</li>
+						<li>Uses masking techniques</li>
+					</ul>
+					<aside class="notes">
+							Across industry, due to their simplicity, static load balancing algorithms tend to be used for load balancing distributed virtual environments. For example, the most commonly used load balancing algorithm for online games, which make up for a large part of the demand for virtual environments, relies upon players to choose to join lightly-loaded servers themselves, as they try to avoid latency. On top of this, it is often the case that these virtual environments are divided up into regions, which separate servers become responsible for. Developers then use various masking techniques like loading screens, animations and cinematics, to hide the latency caused when players are transferred from one server to another. 
+						</aside>
+					</section>
+					<section> 
+						<img src="./assets/Realm_selection.png" alt="Player has to choose their own server">
+					</section>
+					<section>
+						<a href="#top">
+						<img src="./assets/loading_screen_fallout.gif" alt="Fallout loading screen"></a>
+					</section>
+				</section>
+				<section>
+					<h2>Weaknesses</h2>
+					<ul>
+						<li>Cannot adapt to unexpected user behavior</li>
+						<li>Not resilient towards component failure</li>
+						<li>Overprovisions resources</li>
+					</ul>
+					<aside class="notes">
+							However, these static load balancing algorithms do not respond well to unexpected user behavior, or component failure, which can lead to network spikes and workload fluctuations. The over-provisioning of resources at most other times also makes them wasteful.
+					</aside>
+				</section>
+				<section>
+					<section>
+					<h2>Planning</h2>
+					<ul>
+						<li>Researched existing work</li>
+						<li>Chose open source frameworks and tools</li>
+					</ul>
+					<aside class="notes">A lot of research into existing work had been done prior to development, to investigate what the challenges are with load balancing distributed virtual environments, and to discover what approaches had been taken to tackle the problem. The pros and cons of different open source frameworks and tools were also weighed out before they were chosen to aid in the development process. However, before the load balancing algorithms could be designed and implemented, a distributed virtual environment, which supports multiple concurrent clients, had to be built.</aside>
+					</section>
+					<section>
+					<img src="./assets/archi_2.png" style="background-color:white" class="resize">
+					<aside class="notes">Drawing inspiration from, and building upon existing work, development started incrementally on the gate, logic, then master servers, which we will talk about shortly. In short, the functionality of the gate was implemented before the load balancing policies were defined, and deployed, on both gate and logic servers.</aside>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>Logic Servers</h2>
+						<p>Responsible for executing game logic and maintaining state of virtual environment</p>
+						<img src="./assets/game_capture.gif" alt="Game capture">
+					</section>
+					<section>
+						<h2>Master Server</h2>
+						<p>Monitors requests and status of each component</p>
+						<img src="./assets/master_server.gif" alt="Master server">
+					</section>
+					<section>
+						<h2>Gate Server</h2>
+						<p>Assigns newly-connected clients to a logic server</p>
+					</section>
+					<!-- TODO: Make sure the notes show up on the slides -->
+					<aside class="notes">The logic servers in our distributed system are responsible for executing the game logic and maintaining the state of the virtual environment. Upon completion of the functionality of the virtual environment on the logic servers, the master server was then built to monitor requests, and the status of each component. Through the master server, the distributed system reports its workload, such that the efficiency of the system can be measured. This information is plotted out graphically on a web interface in real time, for easy comparison, as shown in this screenshot.
+							
+					Then, modelled after the standard generally employed across industry, the static load balancing algorithm was implemented on the gate and logic servers. Upon establishing a connection with a client, the gate server gets the starting coordinates of the client’s avatar, before choosing which server to assign the client to, as each server is responsible for all objects within a pre-defined range of coordinates. The client is then allocated a logic server to connect to, and is disconnected from the gate.</aside>
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
