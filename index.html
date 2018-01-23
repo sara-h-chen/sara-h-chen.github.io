@@ -56,7 +56,7 @@
 					</ul>
 					<img src="./assets/robinson.gif" alt="robinson">
 					<aside class="notes">
-						Before I start talking about the project itself, I would first like to talk about some of the context surrounding the topic. In recent years, as seen with the increasing popularity of AR and VR applications, there has been a push for more immersive experiences; as a result, virtual environments are becoming increasingly complex. So, to cope with this, and growing demand, most virtual environments are now hosted on distributed systems,
+						Before I start talking about the project itself, I would first like to cover some context surrounding the topic. In recent years, as seen with the increasing popularity of AR and VR applications, there has been a push for more immersive experiences; as a result, virtual environments are becoming increasingly complex. So, to cope with this, and the growing demand, most virtual environments are now hosted on distributed systems,
 					</aside>
 				</section>
 				<section>
@@ -68,11 +68,13 @@
 						<li>Enforcing guaranteed delivery takes time and bandwidth</li>
 					</ul>
 					<aside class="notes">
-						where, to maintain system consistency, messages have to be passed along a limited bandwidth at high frequency between the many components. Due to the unreliable nature of networks, packet delivery cannot be guaranteed, and taking steps to enforce guaranteed delivery and ordering takes up time and bandwidth. This eventually creates a bottleneck, and leads to the overloading problem, as the number of messages exceeds a server's capacity and slows down the entire system. To mitigate this problem, load balancing was introduced, but re-distributing workload across the system takes time. 
+						where, to maintain system consistency, messages have to be passed along a limited bandwidth at high frequency between the many components. Due to the unreliable nature of networks, packet delivery cannot be guaranteed, and taking steps to enforce guaranteed delivery and ordering takes up time and bandwidth. This eventually creates a bottleneck, and leads to
 					</aside>
 				</section>
 				<section>
 					<p>Leads to the</p><p style="color:#7CDFFF"><em>overloading problem</em></p>
+					<aside class="notes"> 
+						the overloading problem, as the number of messages exceeds a server's capacity and slows down the entire system. To mitigate this problem, load balancing was introduced, but re-distributing workload across the system takes time. </aside>
 				</section>
 				<section>
 					<h2>Added Complexity</h2>
@@ -100,15 +102,21 @@
 						<li>Uses masking techniques</li>
 					</ul>
 					<aside class="notes">
-							Across industry, due to their simplicity, static load balancing algorithms tend to be used for load balancing distributed virtual environments. For example, the most commonly used load balancing algorithm for online games, which make up for a large part of the demand for virtual environments, relies upon players to choose to join lightly-loaded servers themselves, as they try to avoid latency. On top of this, it is often the case that these virtual environments are divided up into regions, which separate servers become responsible for. Developers then use various masking techniques like loading screens, animations and cinematics, to hide the latency caused when players are transferred from one server to another. 
+							Across industry, due to their simplicity, static load balancing algorithms tend to be used for load balancing distributed virtual environments. For example, the most commonly used load balancing algorithm for online games, which make up for a large part of the demand for virtual environments, 
 						</aside>
 					</section>
 					<section> 
 						<img src="./assets/Realm_selection.png" alt="Player has to choose their own server">
+						<aside class="notes">
+							relies upon players to choose to join lightly-loaded servers themselves, as they try to avoid latency. On top of this, it is often the case that these virtual environments are divided up into regions, which separate servers become responsible for.
+						</aside>
 					</section>
 					<section>
 						<a href="#top">
 						<img src="./assets/loading_screen_fallout.gif" alt="Fallout loading screen"></a>
+						<aside class="notes">
+							Developers then use various masking techniques like loading screens, animations and cinematics, to hide the latency caused when players are transferred from one server to another. 
+						</aside>
 					</section>
 				</section>
 				<section>
@@ -124,16 +132,21 @@
 				</section>
 				<section>
 					<section>
-					<h2>Planning</h2>
-					<ul>
-						<li>Researched existing work</li>
-						<li>Chose open source frameworks and tools</li>
-					</ul>
-					<aside class="notes">A lot of research into existing work had been done prior to development, to investigate what the challenges are with load balancing distributed virtual environments, and to discover what approaches had been taken to tackle the problem. The pros and cons of different open source frameworks and tools were also weighed out before they were chosen to aid in the development process. However, before the load balancing algorithms could be designed and implemented, a distributed virtual environment, which supports multiple concurrent clients, had to be built.</aside>
+						<h2>Planning</h2>
+						<ul>
+							<li>Researched existing work</li>
+							<li>Chose open source frameworks and tools</li>
+						</ul>
+						<aside class="notes">
+							Prior to development, a lot of research into existing work was carried out to investigate what the challenges are with load balancing distributed virtual environments, and to discover what approaches had been taken to tackle the problem. The pros and cons of different open source frameworks and tools were weighed out and a few were chosen to aid in the development process. However, before the load balancing algorithms could be designed and implemented, a distributed virtual environment, which supports multiple concurrent clients, had to be built.
+						</aside>
 					</section>
 					<section>
-					<img src="./assets/archi_2.png" style="background-color:white" class="resize">
-					<aside class="notes">Drawing inspiration from, and building upon existing work, development started incrementally on the gate, logic, then master servers, which we will talk about shortly. In short, the functionality of the gate was implemented before the load balancing policies were defined, and deployed, on both gate and logic servers.</aside>
+						<!-- TODO: Change this picture -->
+						<img src="./assets/archi_2.png" style="background-color:white" class="resize">
+						<aside class="notes">
+							Drawing inspiration from existing work, and building upon it, development started incrementally on the gate, logic, and master servers, which we will talk about shortly.
+						</aside>
 					</section>
 				</section>
 				<section>
@@ -141,41 +154,61 @@
 						<h2>Logic Servers</h2>
 						<p>Responsible for executing game logic and maintaining state of virtual environment</p>
 						<img src="./assets/game_capture.gif" alt="Game capture">
+						<aside class="notes">
+							Now, we'll talk about our components. The logic servers in our distributed system are responsible for executing the game logic and maintaining the state of the virtual environment. Each logic server is responsible for a different region within the virtual environment, and for all the objects within a pre-defined range of coordinates.
+						</aside>
+					</section>
+					<section>
+						<!-- TODO: Proof=read from here -->
+						<h2>Redis Server</h2>
+						<p>Acts as a <span style="color: #7CDFFF">message queue</span> and guarantees that a client continues to receive updates on an area of interest that spans different servers</p>
+						<aside class="notes">
+							However, within bands that overlap the boundaries between regions, two adjacent servers share all updates with one another. This is to guarantee that the client continues to receive all updates within its area of interest, even when this area of interest spans two adjacent servers. This also allows a smoother transition when a player is handed over to the next server, as both servers would already be synchronized within this band. With a Redis server acting as a message queue, we employ the publish-subscribe design pattern, where our logic server becomes both a subscriber and a publisher. And, upon completion of the functionality of the virtual environment on the logic servers,
+						</aside>
 					</section>
 					<section>
 						<h2>Master Server</h2>
 						<p>Monitors requests and status of each component</p>
 						<img src="./assets/master_server.gif" alt="Master server">
+						<aside class="notes">
+							the master server was then built to monitor requests, and the status of each component. Through the master server, the distributed system reports its workload, such that the efficiency of the system can be measured. This information is plotted out graphically on a web interface in real time, for easy comparison, as shown in this screen capture.
+						</aside>
 					</section>
 					<section>
 						<h2>Gate Server</h2>
 						<p>Assigns newly-connected clients to a logic server</p>
+						<aside class="notes">
+							Then, modelled after the standard generally employed across industry, the static load balancing algorithm was implemented on the gate and logic servers. Upon establishing a connection with a client, the gate server gets the starting coordinates of the client’s avatar, before choosing which server to assign the client to. The client is then disconnected from the gate.
+						</aside>
 					</section>
-					<!-- TODO: Make sure the notes show up on the slides -->
-					<aside class="notes">The logic servers in our distributed system are responsible for executing the game logic and maintaining the state of the virtual environment. Upon completion of the functionality of the virtual environment on the logic servers, the master server was then built to monitor requests, and the status of each component. Through the master server, the distributed system reports its workload, such that the efficiency of the system can be measured. This information is plotted out graphically on a web interface in real time, for easy comparison, as shown in this screenshot.
-							
-					Then, modelled after the standard generally employed across industry, the static load balancing algorithm was implemented on the gate and logic servers. Upon establishing a connection with a client, the gate server gets the starting coordinates of the client’s avatar, before choosing which server to assign the client to, as each server is responsible for all objects within a pre-defined range of coordinates. The client is then allocated a logic server to connect to, and is disconnected from the gate.</aside>
 				</section>
 				<section>
 					<h2>AI Bots</h2>
-					<p>Generate traffic to stress servers</p>
+					<p>Sufficient to generate the traffic needed to stress servers</p>
+					<img src="./assets/ai_bots.gif" alt="AI bots">
 					<aside class="notes">
 						So, a common technique used in existing work to stress servers involves implementing waves of incoming clients using AI profiles that simulate player movement. Although unable to mimic player behavior exactly, this method is sufficient to generate the traffic needed to gauge the load balancing algorithm being evaluated. At present, the bots display only very simple behavior, and generate traffic by walking in circles where they spawn, as shown in this screen capture.
 					</aside>
 				</section>
 				<section>
 					<section>
-					<h2>Evaluation Methods</h2>
-					<ul>
-						<li>Latency</li>
-						<li>CPU Utilization</li>
-					</ul>
+						<h2>Evaluation Methods</h2>
+						<ul>
+							<li>Latency</li>
+							<li>CPU Utilization</li>
+						</ul>
+						<aside class="notes">
+							To evaluate and measure the efficiency of our load balancing algorithms, we will be working with two metrics: latency, and CPU utilization of the independent processes. 
+						</aside>
 					</section>
 					<section>
 						<h2>Latency</h2>
-						<p>Estimated using a <em>ping-pong</em> scheme</p>
+						<p>Estimated using a <span style="color:#7CDFFF">ping-pong</span> scheme</p>
 						<br>
 						<p><strong>Median</strong> latency is used to prevent data from being skewed</p>
+						<aside class="notes">
+							The latency between the issuance of client requests and the receiving of responses from the system actually gives a good measure of the general performance of the system as a whole; this is simply due to the fact that latency increases with the number of overloaded components, and with network congestion. In our distributed system, latency is estimated using a ping-pong scheme: a “ping” packet is sent to the clients with an additional time stamp field, and clients respond with a “pong” packet containing the unmodified stamp field, allowing the calculation of the total time taken for a packet to make a round-trip from server to client. But, to prevent our data from being skewed by outliers (for example, when a single packet is lost and the TCP connection has to recover the lost packet), we rely on median latency instead to give us a rough approximation of how well the system is performing.
+						</aside>
 					</section>
 					<section>
 						<h2>CPU Utilization</h2>
@@ -183,12 +216,10 @@
 							<li>Watches for overloading on components</li>
 							<li>Verifies if workload has been distributed evenly across the system</li>
 						</ul>
+						<aside class="notes">
+							At each of our components, we measure CPU utilization to watch for overloading, and to verify if the workload has been distributed relatively evenly across the system. Each component periodically pushes their status to the master server, which will then queue the information it receives for batch processing.
+						</aside>
 					</section>
-					<aside class="notes">
-						To evaluate and measure the efficiency of our load balancing algorithms, we will be working with two metrics: latency, and CPU utilization of the independent processes. The latency between the issuance of client requests and the receiving of responses from the system actually gives a good measure of the general performance of the system as a whole; this is simply due to the fact that latency increases with the number of overloaded components, and with network congestion. In our distributed system, latency is estimated using a ping-pong scheme: a “ping” packet is sent to the clients with an additional time stamp field, and clients respond with a “pong” packet containing the unmodified stamp field, allowing the calculation of the total time taken for a packet to make a round-trip from server to client. But, to prevent our data from being skewed by outliers (for example, when a single packet is lost and the TCP connection has to recover the lost packet), we rely on median latency instead to give us a rough approximation of how well the system is performing.
-						
-						At each of our components, we measure CPU utilization to watch for overloading, and to verify if the workload has been distributed relatively evenly across the system. Each component periodically pushes their status to the master server, which will then queue the information it receives for batch processing.
-					</aside>
 				</section>
 				<section>
 					<section>
