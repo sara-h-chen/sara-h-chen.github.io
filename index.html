@@ -138,7 +138,7 @@
 							<li>Chose open source frameworks and tools</li>
 						</ul>
 						<aside class="notes">
-							Prior to development, a lot of research into existing work was carried out to investigate what the challenges are with load balancing distributed virtual environments, and to discover what approaches had been taken to tackle the problem. The pros and cons of different open source frameworks and tools were weighed out and a few were chosen to aid in the development process. However, before the load balancing algorithms could be designed and implemented, a distributed virtual environment, which supports multiple concurrent clients, had to be built.
+							Prior to development, research into existing work was carried out to investigate what the challenges are with load balancing distributed virtual environments, and to discover what approaches had been taken to tackle the problem. The pros and cons of different open source frameworks and tools were weighed out and a few were chosen to aid in the development process. However, before the load balancing algorithms could be designed and implemented, a distributed virtual environment, which supports multiple concurrent clients, had to be built.
 						</aside>
 					</section>
 					<section>
@@ -159,11 +159,10 @@
 						</aside>
 					</section>
 					<section>
-						<!-- TODO: Proof=read from here -->
 						<h2>Redis Server</h2>
 						<p>Acts as a <span style="color: #7CDFFF">message queue</span> and guarantees that a client continues to receive updates on an area of interest that spans different servers</p>
 						<aside class="notes">
-							However, within bands that overlap the boundaries between regions, two adjacent servers share all updates with one another. This is to guarantee that the client continues to receive all updates within its area of interest, even when this area of interest spans two adjacent servers. This also allows a smoother transition when a player is handed over to the next server, as both servers would already be synchronized within this band. With a Redis server acting as a message queue, we employ the publish-subscribe design pattern, where our logic server becomes both a subscriber and a publisher. And, upon completion of the functionality of the virtual environment on the logic servers,
+							However, within bands that overlap boundaries between different regions, two adjacent servers share all updates with one another. This is to guarantee that a player continues to receive all updates within its area of interest, even when this area of interest spans two adjacent servers. This also allows a smoother transition when a client is handed over to the next server, as both servers would already be synchronized within this band. With a Redis server acting as a message queue, we employ the publish-subscribe design pattern, where our logic server becomes both a subscriber and a publisher. Upon completion of the virtual environment on the logic servers,
 						</aside>
 					</section>
 					<section>
@@ -171,14 +170,14 @@
 						<p>Monitors requests and status of each component</p>
 						<img src="./assets/master_server.gif" alt="Master server">
 						<aside class="notes">
-							the master server was then built to monitor requests, and the status of each component. Through the master server, the distributed system reports its workload, such that the efficiency of the system can be measured. This information is plotted out graphically on a web interface in real time, for easy comparison, as shown in this screen capture.
+							the master server was built to monitor requests and the status of each component. Through the master server, the distributed system reports its workload, such that the efficiency of the system can be measured. This information is plotted out graphically on a web interface in real time, for easy comparison.
 						</aside>
 					</section>
 					<section>
 						<h2>Gate Server</h2>
 						<p>Assigns newly-connected clients to a logic server</p>
 						<aside class="notes">
-							Then, modelled after the standard generally employed across industry, the static load balancing algorithm was implemented on the gate and logic servers. Upon establishing a connection with a client, the gate server gets the starting coordinates of the client’s avatar, before choosing which server to assign the client to. The client is then disconnected from the gate.
+							Then, modelled after the standard generally employed across industry, which was described earlier, the static load balancing algorithm was implemented on the gate and logic servers. So, upon establishing the initial connection with a client, the gate server gets the starting coordinates of the client’s avatar before choosing which server to assign the client to. The client is then disconnected from the gate.
 						</aside>
 					</section>
 				</section>
@@ -187,7 +186,7 @@
 					<p>Sufficient to generate the traffic needed to stress servers</p>
 					<img src="./assets/ai_bots.gif" alt="AI bots">
 					<aside class="notes">
-						So, a common technique used in existing work to stress servers involves implementing waves of incoming clients using AI profiles that simulate player movement. Although unable to mimic player behavior exactly, this method is sufficient to generate the traffic needed to gauge the load balancing algorithm being evaluated. At present, the bots display only very simple behavior, and generate traffic by walking in circles where they spawn, as shown in this screen capture.
+						A common technique used in existing work to stress servers involves implementing waves of incoming clients using AI profiles that simulate player movement. Although unable to mimic player behavior exactly, this method is sufficient to generate the traffic needed to gauge the load balancing algorithm being evaluated. At present, the bots display only very simple behavior, and generate traffic by walking in circles where they spawn, as shown in this screen capture.
 					</aside>
 				</section>
 				<section>
@@ -207,7 +206,7 @@
 						<br>
 						<p><strong>Median</strong> latency is used to prevent data from being skewed</p>
 						<aside class="notes">
-							The latency between the issuance of client requests and the receiving of responses from the system actually gives a good measure of the general performance of the system as a whole; this is simply due to the fact that latency increases with the number of overloaded components, and with network congestion. In our distributed system, latency is estimated using a ping-pong scheme: a “ping” packet is sent to the clients with an additional time stamp field, and clients respond with a “pong” packet containing the unmodified stamp field, allowing the calculation of the total time taken for a packet to make a round-trip from server to client. But, to prevent our data from being skewed by outliers (for example, when a single packet is lost and the TCP connection has to recover the lost packet), we rely on median latency instead to give us a rough approximation of how well the system is performing.
+							The time taken between the issuance of a request and the receiving of responses from the system actually gives a good measure of the general performance of the system as a whole; this is simply due to the fact that latency increases with the number of overloaded components, and with network congestion. In our distributed system, latency is estimated using a ping-pong scheme: a “ping” packet is sent to clients with an additional time stamp field, and clients respond with a “pong” packet containing the unmodified stamp field, allowing the calculation of the total time taken for a packet to make a round-trip from server to client. But, to prevent our data from being skewed by outliers (for example, when a single packet is lost and the TCP connection has to recover the lost packet), we rely on median latency instead to give us a rough approximation of how well the system is performing.
 						</aside>
 					</section>
 					<section>
@@ -229,42 +228,48 @@
 						<h2>Dynamic Load Balancing</h2>
 						<p>Built around the idea of utilizing the properties of the</p>
 						<p style="color:gold">Fibonacci Heap</p>
+						<aside class="notes">
+								The dynamic load balancing algorithm remains to be completed, but once implemented, would allow the distributed virtual environment to adapt to workload fluctuations. This algorithm is built around the idea of utilizing the properties of the Fibonacci heap, and allowing the master server to pre-empt player transfers if a component is found to be overloaded. With the master server monitoring the status of each server, the workload on each individual component across the system can be maintained in a Fibonacci heap, 
+						</aside>
 					</section>
 					<section>
-							<table id="#table">
-									<tbody>
-									<tr>
-									<td style="vertical-align:middle" align="center">Operation</td>
-									<td align="center">Binary Heap</td>
-									<td align="center">Binomial Heap</td>
-									<td align="center" style="color: gold">Fibonacci Heap</td>
-									</tr>
-									<tr>
-									<td align="center">findMin</td>
-									<td align="center">1</td>
-									<td align="center">log <em>n</em></td>
-									<td align="center" style="color:gold">1</td>
-									</tr>
-									<tr>
-									<td align="center">insert</td>
-									<td align="center">log <em>n</em></td>
-									<td align="center">log <em>n</em></td>
-									<td align="center" style="color:gold">1</td>
-									</tr>
-									<tr>
-									<td align="center">decreaseKey</td>
-									<td align="center">log <em>n</em></td>
-									<td align="center">log <em>n</em></td>
-									<td align="center" style="color:gold">1</td>
-									</tr>
-									<tr>
-									<td align="center">Merge</td>
-									<td align="center"><em>n</em></td>
-									<td align="center">log <em>n</em></td>
-									<td align="center" style="color:gold">1</td>
-									</tr>
-									</tbody>
-									</table>
+						<table id="#table">
+								<tbody>
+								<tr>
+								<td style="vertical-align:middle" align="center">Operation</td>
+								<td align="center">Binary Heap</td>
+								<td align="center">Binomial Heap</td>
+								<td align="center" style="color: gold">Fibonacci Heap</td>
+								</tr>
+								<tr>
+								<td align="center">findMin</td>
+								<td align="center">1</td>
+								<td align="center">log <em>n</em></td>
+								<td align="center" style="color:gold">1</td>
+								</tr>
+								<tr>
+								<td align="center">insert</td>
+								<td align="center">log <em>n</em></td>
+								<td align="center">log <em>n</em></td>
+								<td align="center" style="color:gold">1</td>
+								</tr>
+								<tr>
+								<td align="center">decreaseKey</td>
+								<td align="center">log <em>n</em></td>
+								<td align="center">log <em>n</em></td>
+								<td align="center" style="color:gold">1</td>
+								</tr>
+								<tr>
+								<td align="center">Merge</td>
+								<td align="center"><em>n</em></td>
+								<td align="center">log <em>n</em></td>
+								<td align="center" style="color:gold">1</td>
+								</tr>
+							</tbody>
+						</table>
+						<aside class="notes">
+							which outperforms many other priority queue data structures, including the binary and binomial heap. The Fibonacci heap can maintain the least-loaded server at its root, such that the initial request from a client can immediately be routed to the least-loaded server. As the workload on each server changes, the Fibonacci heap must repeatedly restructure to maintain this property, but because the Fibonacci heap has a better amortized complexity for most heap operations, the delay caused by the restructuring of the heap and the subsequent load balancing can be minimized.
+						</aside>		
 					</section>
 					<section>
 						<h2>Improved AI Behavior</h2>
@@ -273,9 +278,7 @@
 						<p><span style="color:#7CDFFF">Hotspots</span> can be added to emulate production environments</p>
 					</section>
 					<aside class="notes">
-							The dynamic load balancing algorithm remains to be completed, but once implemented, would allow the distributed virtual environment to adapt to workload fluctuations. The dynamic load balancing algorithm is built around the idea of utilizing the properties of the Fibonacci heap data structure, and allowing the master server to pre-empt player transfers if a component is found to be overloaded. With the master server monitoring the status of each server, the workload on each individual component across the system can be maintained in a Fibonacci heap, which outperforms many other priority queue data structures, including the binary and binomial heap. Like the other heaps, the Fibonacci heap can maintain the least-loaded server at its root, such that the initial request from a client can immediately be routed to the least-loaded server in constant time. As the workload on each server changes, The Fibonacci heap must repeatedly restructure to maintain this property, but because the Fibonacci heap has a better amortized complexity for most heap operations, compared to the binary heap that is used in existing work, the delay caused by the restructuring of the heap and the subsequent load balancing can be minimized.
-							
-							If time permits, improvements will also be made to the AI profiles, giving them more complex behavior that is modelled after population movement to better resemble human behavior. Hotspots, which the bots can flock to at random, can be chosen and added to the experiments to place further stress upon the system and to measure the efficiency of the load balancing algorithm when dealing with unexpected network spikes. This emulates production environments, in which players might randomly congregate due to self-organized activity, stressing the server responsible for the region within the virtual environment.
+							If time permits, improvements will also be made to the AI profiles, giving them more complex behavior, which will be modelled after population movement, to better resemble human behavior. Hotspots, which the bots will flock to at random, can be chosen and added to the experiments to place further stress upon the system and to measure the efficiency of the load balancing algorithm when dealing with unexpected network spikes. This emulates production environments, in which players might randomly congregate due to self-organized activity, stressing the server responsible for the region within the virtual environment.
 					</aside>
 				</section>
 			</div>
